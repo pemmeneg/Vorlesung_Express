@@ -1,6 +1,8 @@
+// nedb Store
+var Datastore = require('nedb'), db = new Datastore({filename: 'public/dataStore.db', autoload: true});
+
 class Order{
-    constructor(id, pizzaName, orderedBy){
-        this.id = id;
+    constructor(pizzaName, orderedBy){
         this.orderedBy = orderedBy;
         this.pizzaName = pizzaName;
         this.orderDate = new Date();
@@ -14,24 +16,28 @@ class OrderStore {
         this.orders = [];
     }
 
-    add(pizzaName, orderedBy) {
-        let order = new Order(this.orders.length, pizzaName, orderedBy);
+    add(pizzaName, orderedBy, callback) {
+        let order = new Order(pizzaName, orderedBy);
         this.orders.push(order);
-        return order;
-
+        db.insert(order, function (err, newDoc) {
+            if(callback) {
+                callback(err, newDoc);
+            }
+        })
     }
 
     delete(id) {
-        let order = this.get(id);
-        if(order)
-        {
-            order.state = "DELETED";
-        }
-        return order;
+        db.update({_id:id}, {$set : {state: "DELETED"}}, function (err, numReplaced) {
+            console.log(numReplaced);
+        });
     }
 
-    get(id) {
-        return this.orders[id];
+    get(id, callback) {
+        db.findOne({_id:id}, function (err, doc) {
+            if(callback) {
+                callback(err, doc);
+            }
+        });
     }
 
     all() {

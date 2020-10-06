@@ -7,6 +7,7 @@ const sessionUserSettings = (req, res, next) => {
     // default Wert oder aktueller Wert von der Session lesen
     const userSettings = req.session.userSettings || {orderBy: 'default', orderDirection: -1};
     const {orderBy, orderDirection} = req.query;
+    console.log("\n\n"+JSON.stringify(req.session.userSettings)+"\n\n");
 
     if (orderBy) {
         userSettings.orderBy = orderBy;
